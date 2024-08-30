@@ -1,0 +1,1 @@
+export { default, ProtCalculatorPage } from './ProtCalculatorPage';
