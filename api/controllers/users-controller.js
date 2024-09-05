@@ -2,16 +2,14 @@
 
 /* Libraries */
 const { validationResult } = require('express-validator');
+const fs = require('fs');
 
 /* Application files */
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
-
-let DUMMY_USERS = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', password: 'password1' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', password: 'password2' },
-    { id: '3', name: 'Bob Johnson', email: 'bob@example.com', password: 'password3' }
-];
+const { createWorkoutDays } = require('../controllers/workouts-controller');
+const { createGoals } = require('../controllers/goals-controller');
+const user = require('../models/user');
 
 async function getAllUsers(req, res, next) {
     let users
@@ -71,9 +69,10 @@ async function signUp(req, res, next) {
     const newUser = new User({
         name,
         email,
-        image: 'https://via.placeholder.com/150',
+        image: req.file.path,
         password,
-        products: []
+        products: [],
+        workouts: []
     });
 
     try {
@@ -81,8 +80,20 @@ async function signUp(req, res, next) {
     } catch (err) {
         return next(new HttpError('Signing up failed, please try again.', 500));
     }
-    
+    //Call these vua button in the UserPage
+    // try {
+    //     await createWorkoutDays({ body: { creator: newUser.id } }, res, next);
+    // } catch (err) {
+    //     return next(new HttpError('Creating workout days failed, please try again.', 500));
+    // }
+
+    // try {
+    //     await createGoals({ body: { creator: newUser.id } }, res, next);
+    // } catch (err) {
+    //     return next(new HttpError('Creating goals failed, please try again.', 500));
+    // }
     res.status(201).json({ user: newUser.toObject({ getters: true }) });
+    
 }
 
 async function login(req, res, next) {
@@ -99,7 +110,7 @@ async function login(req, res, next) {
         return next(new HttpError('Invalid credentials, could not log you in.', 401));
     }
 
-    res.json({ message: 'Logged in!' });
+    res.json({ message: 'Logged in!', user: existingUser.toObject({ getters: true }) });
 }
 
 // async function updateUser(req, res, next) {
@@ -139,14 +150,20 @@ async function deleteUser(req, res, next) {
     try {
         user = await User.findById(userId);
     } catch (err) {
-        return next(new HttpError('Could not find the product.', 500));
+        return next(new HttpError('Could not find the user.', 500));
     }
+
+    const imagePath = user.image;
 
     try {
         await user.deleteOne();
     } catch (err) {
-        return next(new HttpError('Could not delete the product.', 500));
+        return next(new HttpError('Could not delete the user.', 500));
     }
+
+    fs.unlink(imagePath, err => {
+        console.log(err);
+    });
 
     res.status(200).json({ message: 'User deleted.' });
 }

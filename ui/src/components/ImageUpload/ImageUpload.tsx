@@ -1,5 +1,5 @@
+/* Libraries */
 import { useRef, useState, useEffect } from 'react';
-
 import Button from '@mui/material/Button';
 
 export function ImageUpload(props: any) {
@@ -10,9 +10,10 @@ export function ImageUpload(props: any) {
 
     const filePickerRef = useRef<HTMLInputElement>(null);
 
-    function pickedHandler(event: any) {
+    function handlePickedImage(event: any) {
         let pickedFile;
         let fileIsValid = isValid;
+
         if (event.target.files && event.target.files.length === 1) {
             pickedFile = event.target.files[0];
             setFile(pickedFile);
@@ -22,7 +23,8 @@ export function ImageUpload(props: any) {
             setIsValid(false);
             fileIsValid = false;
         }
-        props.onInput(props.id, pickedFile, fileIsValid);
+        console.log('fileIsValid:', fileIsValid);
+        props.onInput(pickedFile);
     }
 
     useEffect(() => {
@@ -37,7 +39,7 @@ export function ImageUpload(props: any) {
     }
     , [file]);
 
-    function pickImageHandler() {
+    function handlePickImage() {
         if (filePickerRef.current) {
             filePickerRef.current.click();
         }
@@ -51,14 +53,16 @@ export function ImageUpload(props: any) {
                 style={{ display: 'none' }}
                 type="file"
                 accept=".jpg,.png,.jpeg"
-                onChange={pickedHandler}
+                onChange={handlePickedImage}
             />
-            <div className={`image-upload ${props.center && 'center'}`}>
-                <div className="image-upload__preview">
-                    {previewUrl && <img src={previewUrl} alt="Preview" />}
+            <div>
+                <div>
+                    <div>
+                        {previewUrl && <img src={previewUrl} alt="Preview" />}
+                    </div>
                     {!previewUrl && <p>Please pick an image.</p>}
                 </div>
-                <Button type="button" onClick={pickImageHandler}>PICK IMAGE</Button>
+                <Button onClick={handlePickImage}>PICK IMAGE</Button>
             </div>
             {!isValid && <p>{props.errorText}</p>}
         </div>
