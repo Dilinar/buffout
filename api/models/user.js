@@ -12,6 +12,8 @@ const userSchema = new Schema({
     image: { type: String, required: true },
     password: { type: String, required: true, minlength: 6 },
     products: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Product' }],
+    workouts: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Workout' }],
+    goals: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Goal' }]
 });
 
 userSchema.plugin(uniqueValidator);
