@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
 
 export function UserItem(props: any) {
-    console.log(`http://localhost:3000/${props.image}`);
+
     return (
         <li>
             <Link to={`/account/${props.id}`}>

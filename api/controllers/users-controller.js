@@ -3,6 +3,8 @@
 /* Libraries */
 const { validationResult } = require('express-validator');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 /* Application files */
 const HttpError = require('../models/http-error');
@@ -63,14 +65,21 @@ async function signUp(req, res, next) {
     if (existingUserEmail) {
         return next(new HttpError('User exists already, please login instead.', 422));
     } else if (existingUserName) {
-        return next(new HttpError('Username exists already, please choose another.', 422));
+        return next(new HttpError('User name taken, please choose a different one.', 422));
+    }
+
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(password, 12)
+    } catch (err) {
+        return next(new HttpError('Could not create user, please try again.', 500));    
     }
 
     const newUser = new User({
         name,
         email,
         image: req.file.path,
-        password,
+        password: hashedPassword,
         products: [],
         workouts: []
     });
@@ -80,7 +89,18 @@ async function signUp(req, res, next) {
     } catch (err) {
         return next(new HttpError('Signing up failed, please try again.', 500));
     }
-    //Call these vua button in the UserPage
+
+    let token;
+    try {
+        token = jwt.sign(
+            { userId: newUser.id, email: newUser.email, name: newUser.name },
+            'super_top_secret_code_dont_share_with_anyone_ever_04021190',
+            { expiresIn: '1h' }
+        );
+    } catch (err) {
+        return next(new HttpError('Signing up failed, please try again.', 500));
+    }
+    //Call these via button in the UserPage
     // try {
     //     await createWorkoutDays({ body: { creator: newUser.id } }, res, next);
     // } catch (err) {
@@ -92,7 +112,7 @@ async function signUp(req, res, next) {
     // } catch (err) {
     //     return next(new HttpError('Creating goals failed, please try again.', 500));
     // }
-    res.status(201).json({ user: newUser.toObject({ getters: true }) });
+    res.status(201).json({ userId: newUser.id, email: newUser.email, name: newUser.name, token: token });
     
 }
 
@@ -106,11 +126,33 @@ async function login(req, res, next) {
         return next(new HttpError('Loggin in failed, please try again.', 500));
     }
 
-    if (!existingUser || existingUser.password !== password) {
+    if (!existingUser) {
         return next(new HttpError('Invalid credentials, could not log you in.', 401));
     }
 
-    res.json({ message: 'Logged in!', user: existingUser.toObject({ getters: true }) });
+    let isValidPassword = false;
+    try {
+        isValidPassword = await bcrypt.compare(password, existingUser.password);
+    } catch (err) {
+        return next(new HttpError('Could not log you in, please check your credentials and try again.', 500));
+    }
+
+    if (!isValidPassword) {
+        return next(new HttpError('Invalid credentials, could not log you in.', 401));
+    }
+
+    let token;
+    try {
+        token = jwt.sign(
+            { userId: existingUser.id, email: existingUser.email, name: existingUser.name },
+            'super_top_secret_code_dont_share_with_anyone_ever_04021190',
+            { expiresIn: '1h' }
+        );
+    } catch (err) {
+        return next(new HttpError('Logging in failed, please try again.', 500));
+    }
+
+    res.json({ userId: existingUser.id, email: existingUser.email, name: existingUser.name, token: token });
 }
 
 // async function updateUser(req, res, next) {

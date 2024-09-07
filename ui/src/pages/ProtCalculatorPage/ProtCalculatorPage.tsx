@@ -22,7 +22,6 @@ export function ProtCalculatorPage() {
         price: undefined,
         caloriesPerProtein: undefined,
         priceOfProtein: undefined,
-        creator: ''
     }); 
 
     const navigate = useNavigate();
@@ -50,10 +49,10 @@ export function ProtCalculatorPage() {
                     price: formData.price,
                     caloriesPerProtein: formData.caloriesPerProtein,
                     priceOfProtein: formData.priceOfProtein,
-                    creator: auth.userId
                 }),
                 {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
                 }
             );
             navigate(`/account/${auth.userId}`);
