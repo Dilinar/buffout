@@ -1,0 +1,8 @@
+{
+    "env": {
+        "DB_USER": "slavicayarns",
+        "DB_PASSWORD": "6VAtcBjvvHe6rMpB",
+        "DB_NAME": "buffout-dev",
+        "DB_CLUSTER": "buffout-dev"
+    }
+} 

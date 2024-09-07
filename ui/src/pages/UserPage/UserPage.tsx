@@ -72,7 +72,6 @@ export function UserPage() {
             }
         }
 
-
         const fetchGoals = async () => {
 
             try {
@@ -83,8 +82,6 @@ export function UserPage() {
 
             }
         }
-
-
 
         const fetchProducts = async () => {
 

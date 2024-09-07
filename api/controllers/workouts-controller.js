@@ -40,7 +40,7 @@ async function createWorkoutDays(req, res, next) {
     let user;
     
     try {
-        user = await User.findById(creator);
+        user = await User.findById(req.userData.userId);
     } catch (err) {
         return next(new HttpError('Could not find user for provided id.', 404));
     }
@@ -57,7 +57,7 @@ async function createWorkoutDays(req, res, next) {
             const newWorkoutDay = new Workout({
                 day: daysOfWeek[i],
                 exercises: '',
-                creator
+                creator: req.userData.userId
             });
 
             await newWorkoutDay.save({ session });
@@ -91,6 +91,10 @@ async function updateWorkoutDay(req, res, next) {
         workout = await Workout.findById(workoutId);
     } catch (err) {
         return next(new HttpError('Could not find the workout day.', 500));
+    }
+
+    if (workout.creator.toString() !== req.userData.userId) {
+        return next(new HttpError('You are not allowed to edit this workout day.', 401));
     }
 
     workout.exercises = exercises;

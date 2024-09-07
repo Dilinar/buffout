@@ -34,6 +34,8 @@ export function LoginPage() {
     // const { isLoading, error, sendRequest, clearError } = useHttpClient();
     const { isLoading, sendRequest } = useHttpClient();
 
+    const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
+
     function handleModeSwitch() {
         // if (!isLoginMode) {
         //     setFormData({
@@ -180,7 +182,7 @@ export function LoginPage() {
                     },
                 );
 
-                auth.onLogin(responseData.user.id, responseData.user.name);
+                auth.onLogin(responseData.userId, responseData.name, responseData.token, expirationDate);
             } catch (error) {
                 console.error(error);
             }
@@ -199,7 +201,7 @@ export function LoginPage() {
                     appendedFormData
                 );
                 console.log('response Data', responseData);
-                auth.onLogin(responseData.user.id, responseData.user.name);
+                auth.onLogin(responseData.userId, responseData.name, responseData.token, expirationDate);
             } catch (error) {
                 console.error(error);
             }

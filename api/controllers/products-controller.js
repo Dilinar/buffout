@@ -35,7 +35,7 @@ async function createProduct(req, res, next) {
         return next(new HttpError('Invalid inputs passed, please check your data.', 422));
     }
 
-    const { name, protein, calories, price, creator } = req.body;
+    const { name, protein, calories, price } = req.body;
 
     const newProduct = new Product( {
         name,
@@ -44,13 +44,13 @@ async function createProduct(req, res, next) {
         price,
         caloriesPerProtein: calories/protein,
         priceOfProtein: price/protein,
-        creator
+        creator: req.userData.userId
     });
 
     let user;
     
     try {
-        user = await User.findById(creator);
+        user = await User.findById(req.userData.userId);
     } catch (err) {
         return next(new HttpError('Could not find user for provided id.', 404));
     }
@@ -123,10 +123,10 @@ async function deleteProduct(req, res, next) {
         return next(new HttpError('Could not find the product for this id.', 404));
     }
 
-    // if (product.creator.id !== req.userData.userId) {
-    //     const error = new HttpError('You are not allowed to delete this place.', 401);
-    //     return next(error);
-    // }
+    if (product.creator.id !== req.userData.userId) {
+        const error = new HttpError('You are not allowed to delete this product.', 401);
+        return next(error);
+    }
 
     try {
         const session = await mongoose.startSession();
