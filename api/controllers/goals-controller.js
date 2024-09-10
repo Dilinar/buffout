@@ -33,11 +33,11 @@ async function createGoals(req, res, next) {
         return next(new HttpError('Something went wrong, try again later', 422));
     }
 
-    const { creator } = req.body;
+    const { creator, goals } = req.body;
 
     const newGoals = new Goal({
         // title: 'Goals',
-        goals: '',
+        goals: goals,
         creator
     });
 
@@ -59,7 +59,7 @@ async function createGoals(req, res, next) {
         await newGoals.save({ session });
 
         user.goals.push(newGoals);
-        await user.save({ session });
+        await user.save();
 
         await session.commitTransaction();
 
@@ -68,9 +68,43 @@ async function createGoals(req, res, next) {
         return next(error);
     }
 
-
-    res.status(201).json({ message: 'Workout days created successfully.' });
+    res.status(201).json({ goal: newGoals });
 }
+
+const updateGoals = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new HttpError('Invalid inputs passed, please check your data.', 422));
+    }
+
+    const { creator, goals } = req.body;
+    const goalsId = req.params.gid;
+
+    let updatedGoals;
+    try {
+        updatedGoals = await Goal.findById(goalsId);
+    } catch (err) {
+        const error = new HttpError('Something went wrong, could not update the goals.', 500);
+        return next(error);
+    }
+
+    if (updatedGoals.creator.toString() !== creator) {
+        const error = new HttpError('You are not allowed to edit these goals.', 401);
+        return next(error);
+    }
+ 
+    updatedGoals.goals = goals;
+
+    try {
+        await updatedGoals.save();
+    } catch (err) {
+        const error = new HttpError('Something went wrong, could not update the goals.', 500);
+        return next(error);
+    }
+
+    res.status(200).json({goal: updatedGoals.toObject({getters: true})});
+};
 
 exports.getGoalsByUserId = getGoalsByUserId;
 exports.createGoals = createGoals;
+exports.updateGoals = updateGoals;

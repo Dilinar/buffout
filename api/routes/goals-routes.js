@@ -11,6 +11,6 @@ router.get('/:uid', goalsController.getGoalsByUserId);
 
 router.post('/create', goalsController.createGoals);
 
-// router.patch('/:pid', workoutsController.updateWorkoutDay);
+router.patch('/:gid', goalsController.updateGoals);
 
 module.exports = router;

@@ -63,7 +63,7 @@ export function ProtCalculatorPage() {
 
     return (
         <React.Fragment>
-            <h1>Protein calculator</h1>
+            <h2>Protein calculator</h2>
             <Box
                 component="form"
                 onSubmit={handleProductSubmit}
