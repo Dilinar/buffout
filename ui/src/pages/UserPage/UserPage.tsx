@@ -6,35 +6,38 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import { Typography } from "@mui/material";
 
 import useHttpClient from '../../hooks/http-hook';
 import { AuthContext } from '../../context';
+
+type User = {
+    id: string;
+    name: string;
+}
 
 export function UserPage() {
 
     const auth = useContext(AuthContext)
 
-    const { isLoading, error, sendRequest } = useHttpClient();
+    const { isLoading, sendRequest } = useHttpClient();
     
     const [ loadedWorkouts, setLoadedWorkouts ] = useState([]);
     const [ loadedGoals, setLoadedGoals ] = useState([]);
     const [ loadedProducts, setLoadedProducts ] = useState([]);
-    
-    interface User {
-        id: string;
-        name: string;
-        // Add other properties as needed
-    }
+
     
     const [loadedUser, setLodedUser] = useState<User | null>(null);
 
     const [ dialogInfo, setDialogInfo ] = useState({
+        type: '',
         isOpen: false,
         title: '',
         id: ''
     });
 
     const [ selectedExercises, setSelectedExercises ] = useState('');
+    const [ selectedGoals, setSelectedGoals ] = useState('');
 
     // const [ formData, setFormData ] = useState({
     //     name: '',
@@ -48,70 +51,62 @@ export function UserPage() {
 
     const userId = useParams().userId;
 
-    async function fetchWorkouts() {
+    async function handleAddGoals(event: React.FormEvent) {
+        event.preventDefault();
 
         try {
-            const responseData = await sendRequest(`http://localhost:3000/api/workouts/${userId}`);
-
-            setLoadedWorkouts(responseData.workouts);
+            await sendRequest(
+                'http://localhost:3000/api/goals/create',
+                'POST',
+                JSON.stringify({
+                    goals: selectedGoals,
+                    creator: auth.userId
+                }),
+                {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+    
+            setLoadedGoals([
+                {
+                    goals: selectedGoals
+                }
+            ]);
+            
+            handleDialogClose();
         } catch (error: any) {
-
+            console.error(error);
         }
     };
 
-    useEffect(() => {
+    async function handleUpdateGoals(event: React.FormEvent) {
+        event.preventDefault();
 
-        const fetchUser = async () => {
+        try {
+            await sendRequest(
+                `http://localhost:3000/api/goals/${dialogInfo.id}`,
+                'PATCH',
+                JSON.stringify({
+                    goals: selectedGoals,
+                    creator: auth.userId
+                }),
+                {
+                    'Content-Type': 'application/json'
+                }
+            );
 
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/users/${userId}`);
+            setLoadedGoals([
+                {
+                    goals: selectedGoals
+                }
+            ]);
 
-                setLodedUser(responseData.user);
-            } catch (error: any) {
-
-            }
+            handleDialogClose();
+        } catch (error: any) {
+            console.error(error);
         }
-
-        const fetchGoals = async () => {
-
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/goals/${userId}`);
-
-                setLoadedGoals(responseData.goals);
-            } catch (error: any) {
-
-            }
-        }
-
-        const fetchProducts = async () => {
-
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/products/${userId}`);
-
-                setLoadedProducts(responseData.products);
-            } catch (error: any) {
-
-            }
-        }
-
-        fetchUser();
-        fetchGoals();
-        fetchWorkouts();
-        fetchProducts();
-    }, [sendRequest, userId]);
-
-    // function handleErrors() {
-    //     setError(null);
-    // }
-
-    function handleDialogOpen(title: string, id: string, exercises: string) {
-        setSelectedExercises(exercises);
-        setDialogInfo({
-            isOpen: true,
-            title: title,
-            id: id
-        });
-    }
+    };
 
     function handleWorkoutUpdate(event: React.FormEvent) {
         event.preventDefault();
@@ -138,7 +133,7 @@ export function UserPage() {
             ...loadedWorkouts.slice(dayIdIndex + 1)
         ]);
         handleDialogClose();
-    }
+    };
 
     async function handleDeleteProduct(productId: string) {
         try {
@@ -151,26 +146,115 @@ export function UserPage() {
         } catch (err) {
             console.error(err);
         }
-    }
+    };
+
+    function handleDialogOpen(type: string, title: string, id: string, data: string) {
+        if(type === 'workout') {
+            setSelectedExercises(data);
+
+            setDialogInfo({
+                type: type,
+                isOpen: true,
+                title: title,
+                id: id
+            });
+        } else if(type === 'goals') {
+            setSelectedGoals(data);
+
+            setDialogInfo({
+                type: type,
+                isOpen: true,
+                title: title,
+                id: id
+            });
+        }
+    };
 
     function handleDialogClose() {
         setDialogInfo({
+            type: '',
             isOpen: false,
             title: '',
             id: ''
         });
-    }
+    };
+
+
+    useEffect(() => {
+
+        async function fetchUser() {
+            try {
+                const responseData = await sendRequest(`http://localhost:3000/api/users/${userId}`);
+
+                setLodedUser(responseData.user);
+            } catch (error: any) {
+
+            }
+        };
+
+        async function fetchGoals() {
+            try {
+                const responseData = await sendRequest(`http://localhost:3000/api/goals/${userId}`);
+
+                setLoadedGoals(responseData.goals);
+            } catch (error: any) {
+
+            }
+        };
+
+        async function fetchWorkouts() {
+            try {
+                const responseData = await sendRequest(`http://localhost:3000/api/workouts/${userId}`);
+    
+                setLoadedWorkouts(responseData.workouts);
+            } catch (error: any) {
+    
+            }
+        };
+
+        async function fetchProducts() {
+            try {
+                const responseData = await sendRequest(`http://localhost:3000/api/products/${userId}`);
+
+                setLoadedProducts(responseData.products);
+            } catch (error: any) {
+
+            }
+        };
+
+        fetchUser();
+        fetchGoals();
+        fetchWorkouts();
+        fetchProducts();
+    }, [sendRequest, userId]);
+
+    // function handleErrors() {
+    //     setError(null);
+    // }
 
     return (
         <React.Fragment>
             {isLoading && <CircularProgress />}
-            {error && <div>{error}</div>}
-            <h1>{!loadedUser ? null : loadedUser.name}</h1>
+            {/* {error && <div>{error}</div>} */}
+            <h2>{!loadedUser ? null : loadedUser.name}</h2>
             <div>
-                <h2>Goals</h2>
-                {loadedGoals.map(goals => (
-                    <p key={goals.id}>{goals.goals}</p>
-                ))}
+                <h3>{!loadedUser ? null : auth.userId === userId ? 'Your goals' : `${loadedUser.name}'s goals`}</h3>
+                {loadedGoals.length > 0 ? 
+                    loadedGoals.map(goals => (
+                        <div>
+                            <Typography key={goals.id}>            
+                                {goals.goals}
+                            </Typography>
+                        </div>
+                    ))
+                    : <Typography>
+                        {auth.userId === userId ? 'You Have no goals yet.' : 'No goals added'}
+                    </Typography>
+                }
+                
+                    <Button variant='contained' onClick={() => handleDialogOpen('goals', 'Your goals', loadedGoals.length === 0 ? null : loadedGoals[0].id, loadedGoals.length === 0 ? null : loadedGoals[0].goals || null)}>
+                        {loadedGoals.length === 0 ? 'Add Goals' : 'Update Goals'}
+                    </Button> 
             </div>
             <ul>
                 {loadedWorkouts.map(workout => (
@@ -178,7 +262,7 @@ export function UserPage() {
                         <h3>{workout.day}</h3>
                         <p>{workout.exercises}</p>
                         {auth.userId === userId &&
-                            <Button onClick={() => handleDialogOpen(workout.day,workout.id, workout.exercises)}>
+                            <Button onClick={() => handleDialogOpen('workout', workout.day, workout.id, workout.exercises)}>
                                 Update
                             </Button>
                         }
@@ -213,23 +297,35 @@ export function UserPage() {
                 </DialogTitle>
                 <Box
                     component="form"
-                    onSubmit={handleWorkoutUpdate}
+                    onSubmit={dialogInfo.type === 'workout' ? handleWorkoutUpdate : loadedGoals.length === 0 ? handleAddGoals : handleUpdateGoals}
                     sx={{
                         '& .MuiTextField-root': { m: 1, width: '25ch' },
                     }}
                     noValidate
                     autoComplete="off"
                 >
-                    <TextField
-                        id="Exercises"
-                        label="Workout for the day"
-                        variant='outlined' 
-                        type='text' 
-                        size='small'
-                        multiline
-                        value={selectedExercises}
-                        onChange={(e) => setSelectedExercises(e.target.value )}
-                    />
+                    {dialogInfo.type === 'goals' ?
+                        <TextField
+                            id='Goals'
+                            label='Enter goals here'
+                            variant='outlined' 
+                            type='text' 
+                            size='small'
+                            multiline
+                            value={selectedGoals}
+                            onChange={(e) => setSelectedGoals(e.target.value )}
+                        />
+                        : <TextField
+                            id='Workouts'
+                            label='Your Workouts'
+                            variant='outlined' 
+                            type='text' 
+                            size='small'
+                            multiline
+                            value={selectedExercises}
+                            onChange={(e) => setSelectedExercises(e.target.value )}
+                        />
+                    }      
                     <Button type="submit">
                         Update
                     </Button>

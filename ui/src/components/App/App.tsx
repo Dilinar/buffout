@@ -1,16 +1,59 @@
 /* Libraries */
-
-
-/* Types */
-
+import { useState, useCallback, useEffect } from 'react';
+import Paper from '@mui/material/Paper';
 
 /* Application files */
-import AppPage from '../../pages/AppPage';
+import { AuthContext } from '../../context';
+import Router from '../Router';
+
+let logoutTimer: any;
 
 export function App() {
 
+    const [token, setToken] = useState(null);
+    const [tokenExpirationDate, setTokenExpirationDate] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [userName, setUserName] = useState(null);
+
+    const login = useCallback((uid: string, userName: string, token: string, expirationDate: any) => {
+        setToken(token);
+        setUserId(uid);
+        setUserName(userName);
+        const tokenExpirationDate = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
+        setTokenExpirationDate(tokenExpirationDate);
+        localStorage.setItem('userData', JSON.stringify({ userId: uid, userName: userName, token: token, expiration: tokenExpirationDate.toISOString() }));
+    }, []);
+
+    const logout = useCallback(() => {
+        setToken(null);
+        setUserId(null);
+        setUserName(null);
+        setTokenExpirationDate(null);
+        localStorage.removeItem('userData');
+    }, []);
+
+    useEffect(() => {
+        if (token && tokenExpirationDate) {
+            const remainingTime = tokenExpirationDate.getTime() - new Date().getTime();
+            logoutTimer = setTimeout(logout, remainingTime);
+        } else {
+            clearTimeout(logoutTimer);
+        }
+    }, [token, logout, tokenExpirationDate]);
+    
+    useEffect(() => {
+        const storedData = JSON.parse(localStorage.getItem('userData'));
+        if (storedData && storedData.token && new Date(storedData.expiration) > new Date()) {
+            login(storedData.userId, storedData.userName, storedData.token, new Date(storedData.expiration));
+        }
+    }, [login]);
+
     return (
-        <AppPage />
+        <AuthContext.Provider value={{ isLoggedIn: !!token, token: token, userId: userId, userName: userName, onLogin: login, onLogout: logout }}>
+            <Paper>
+                <Router /> 
+            </Paper>
+        </AuthContext.Provider>
     );
 }
 

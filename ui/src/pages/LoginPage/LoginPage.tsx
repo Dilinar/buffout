@@ -200,7 +200,7 @@ export function LoginPage() {
                     'POST',
                     appendedFormData
                 );
-                console.log('response Data', responseData);
+
                 auth.onLogin(responseData.userId, responseData.name, responseData.token, expirationDate);
             } catch (error) {
                 console.error(error);
