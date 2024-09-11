@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import CircularProgress from '@mui/material/CircularProgress';
 
 import UsersList from '../../components/UsersList';
 import useHttpClient from '../../hooks/http-hook';
+import { AuthContext } from '../../context/auth-context';
 
 export function UsersListPage() {
+
+    const auth = useContext(AuthContext)
 
     const { isLoading, error, sendRequest } = useHttpClient();
     const [ loadedUsers, setLoadedUsers ] = useState([]);
@@ -13,7 +16,13 @@ export function UsersListPage() {
         const fetchUsers = async () => {
 
             try {
-                const responseData = await sendRequest('http://localhost:3000/api/users');
+                const responseData = await sendRequest('http://localhost:3000/api/users',
+                    'GET',
+                    null,
+                    {
+                        Authorization: 'Bearer ' + auth.token
+                    }
+                );
 
                 setLoadedUsers(responseData.users);
             } catch (error: any) {

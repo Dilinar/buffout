@@ -36,15 +36,14 @@ async function createGoals(req, res, next) {
     const { creator, goals } = req.body;
 
     const newGoals = new Goal({
-        // title: 'Goals',
         goals: goals,
-        creator
+        creator: req.userData.userId
     });
 
     let user;
     
     try {
-        user = await User.findById(creator);
+        user = await User.findById(req.userData.userId);
     } catch (err) {
         return next(new HttpError('Could not find user for provided id.', 404));
     }
@@ -88,7 +87,7 @@ const updateGoals = async (req, res, next) => {
         return next(error);
     }
 
-    if (updatedGoals.creator.toString() !== creator) {
+    if (updatedGoals.creator.toString() !== req.userData.userId) {
         const error = new HttpError('You are not allowed to edit these goals.', 401);
         return next(error);
     }

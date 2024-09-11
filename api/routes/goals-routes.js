@@ -1,11 +1,13 @@
 /* Libraries */
 const express = require('express');
-const { check } = require('express-validator');
 
 /* Application files */
 const goalsController = require('../controllers/goals-controller');
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
+
+router.use(checkAuth);
 
 router.get('/:uid', goalsController.getGoalsByUserId);
 
