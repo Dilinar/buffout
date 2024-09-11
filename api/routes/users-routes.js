@@ -7,12 +7,9 @@ const { check } = require('express-validator');
 /* Application files */
 const usersController = require('../controllers/users-controller');
 const fileUpload = require('../middleware/file-upload');
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
-
-router.get('/', usersController.getAllUsers);
-
-router.get('/:uid', usersController.getUserById);
 
 router.post('/signup', 
     fileUpload.single('image'),
@@ -29,6 +26,12 @@ router.post('/login',
         check('password').isLength({ min: 6 })
     ],
     usersController.login);
+
+router.use(checkAuth);
+
+router.get('/', usersController.getAllUsers);
+
+router.get('/:uid', usersController.getUserById);
 
 // router.patch('/:uid', 
 //     [

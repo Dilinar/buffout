@@ -51,7 +51,71 @@ export function UserPage() {
 
     const userId = useParams().userId;
 
-    async function handleAddGoals(event: React.FormEvent) {
+    async function fetchUser() {
+        try {
+            const responseData = await sendRequest(`http://localhost:3000/api/users/${userId}`,
+                'GET',
+                null,
+                {
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+
+            setLodedUser(responseData.user);
+        } catch (error: any) {
+
+        }
+    };
+
+    async function fetchGoals() {
+        try {
+            const responseData = await sendRequest(`http://localhost:3000/api/goals/${userId}`,
+                'GET',
+                null,
+                {
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+
+            setLoadedGoals(responseData.goals);
+        } catch (error: any) {
+
+        }
+    };
+
+    async function fetchWorkouts() {
+        try {
+            const responseData = await sendRequest(`http://localhost:3000/api/workouts/${userId}`,
+                'GET',
+                null,
+                {
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+
+            setLoadedWorkouts(responseData.workouts);
+        } catch (error: any) {
+
+        }
+    };
+
+    async function fetchProducts() {
+        try {
+            const responseData = await sendRequest(`http://localhost:3000/api/products/${userId}`,
+                'GET',
+                null,
+                {
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+
+            setLoadedProducts(responseData.products);
+        } catch (error: any) {
+
+        }
+    };
+
+    async function handleCreateGoals(event: React.FormEvent) {
         event.preventDefault();
 
         try {
@@ -60,7 +124,6 @@ export function UserPage() {
                 'POST',
                 JSON.stringify({
                     goals: selectedGoals,
-                    creator: auth.userId
                 }),
                 {
                     'Content-Type': 'application/json',
@@ -68,11 +131,7 @@ export function UserPage() {
                 }
             );
     
-            setLoadedGoals([
-                {
-                    goals: selectedGoals
-                }
-            ]);
+            fetchGoals();
             
             handleDialogClose();
         } catch (error: any) {
@@ -89,10 +148,10 @@ export function UserPage() {
                 'PATCH',
                 JSON.stringify({
                     goals: selectedGoals,
-                    creator: auth.userId
                 }),
                 {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
                 }
             );
 
@@ -108,7 +167,28 @@ export function UserPage() {
         }
     };
 
-    function handleWorkoutUpdate(event: React.FormEvent) {
+    async function handleCreateWorkouts(event: React.FormEvent) {
+        event.preventDefault();
+
+        try {
+            await sendRequest(
+                'http://localhost:3000/api/workouts/create',
+                'POST',
+                null,
+                {
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+    
+            fetchWorkouts();
+            
+            handleDialogClose();
+        } catch (error: any) {
+            console.error(error);
+        }
+    };
+
+    function handleUpdateWorkout(event: React.FormEvent) {
         event.preventDefault();
 
         const dayIdIndex = loadedWorkouts.findIndex((workout: any) => workout.id === dialogInfo.id);
@@ -120,7 +200,8 @@ export function UserPage() {
                 exercises: selectedExercises
             }),
             {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + auth.token
             }
         );
 
@@ -139,7 +220,11 @@ export function UserPage() {
         try {
             await sendRequest(
                 `http://localhost:3000/api/products/${productId}`,
-                'DELETE'
+                'DELETE',
+                null,
+                {
+                    Authorization: 'Bearer ' + auth.token
+                }
             );
 
             setLoadedProducts(loadedProducts.filter((product: any) => product.id !== productId));
@@ -179,54 +264,14 @@ export function UserPage() {
         });
     };
 
-
     useEffect(() => {
-
-        async function fetchUser() {
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/users/${userId}`);
-
-                setLodedUser(responseData.user);
-            } catch (error: any) {
-
-            }
-        };
-
-        async function fetchGoals() {
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/goals/${userId}`);
-
-                setLoadedGoals(responseData.goals);
-            } catch (error: any) {
-
-            }
-        };
-
-        async function fetchWorkouts() {
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/workouts/${userId}`);
-    
-                setLoadedWorkouts(responseData.workouts);
-            } catch (error: any) {
-    
-            }
-        };
-
-        async function fetchProducts() {
-            try {
-                const responseData = await sendRequest(`http://localhost:3000/api/products/${userId}`);
-
-                setLoadedProducts(responseData.products);
-            } catch (error: any) {
-
-            }
-        };
 
         fetchUser();
         fetchGoals();
         fetchWorkouts();
         fetchProducts();
-    }, [sendRequest, userId]);
+        
+    }, [userId]);
 
     // function handleErrors() {
     //     setError(null);
@@ -251,53 +296,66 @@ export function UserPage() {
                         {auth.userId === userId ? 'You Have no goals yet.' : 'No goals added'}
                     </Typography>
                 }
-                
+                {auth.userId === userId &&
                     <Button variant='contained' onClick={() => handleDialogOpen('goals', 'Your goals', loadedGoals.length === 0 ? null : loadedGoals[0].id, loadedGoals.length === 0 ? null : loadedGoals[0].goals || null)}>
                         {loadedGoals.length === 0 ? 'Add Goals' : 'Update Goals'}
                     </Button> 
+                }
             </div>
-            <ul>
-                {loadedWorkouts.map(workout => (
-                    <li key={workout.id}>
-                        <h3>{workout.day}</h3>
-                        <p>{workout.exercises}</p>
-                        {auth.userId === userId &&
-                            <Button onClick={() => handleDialogOpen('workout', workout.day, workout.id, workout.exercises)}>
-                                Update
-                            </Button>
-                        }
-                    </li>
-                ))}
-            </ul>
-            <ul>
-                {loadedProducts.map(product => (
-                    <li key={product.id}>
-                        <h3>{product.name}</h3>
-                        <p>Protein: {product.protein}</p>
-                        <p>Calories: {product.calories}</p>
-                        <p>Price: {product.proce}</p>
-                        <p>Calories per 1g of protein: {product.caloriesPerProtein}</p>
-                        <p>Price of 1g of protein: {product.priceOfProtein}</p>
-                        {auth.userId === userId &&
-                            <>
-                                <Button>
+            <div>
+                <h3>{!loadedUser ? null : auth.userId === userId ? 'Your Workout plan' : `${loadedUser.name}'s workout plan`}</h3>
+                {auth.userId === userId && loadedWorkouts.length === 0 ? 
+                    <Button variant='contained' onClick={handleCreateWorkouts}>
+                        Create Workout Plan
+                    </Button>
+                    : null
+                }
+                <ul>
+                    {loadedWorkouts.map(workout => (
+                        <li key={workout.id}>
+                            <h4>{workout.day}</h4>
+                            <pre>{workout.exercises}</pre>
+                            {auth.userId === userId &&
+                                <Button variant='contained' onClick={() => handleDialogOpen('workout', workout.day, workout.id, workout.exercises)}>
                                     Update
                                 </Button>
-                                <Button onClick={() => handleDeleteProduct(product.id)}>
-                                    Delete
-                                </Button>
-                            </>
-                        }
-                    </li>
-                ))}
-            </ul>
+                            }
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div>
+                <h3>{!loadedUser ? null : auth.userId === userId ? 'Your produkts list' : `${loadedUser.name}'s produkts list`}</h3>
+                <ul>
+                    {loadedProducts.map(product => (
+                        <li key={product.id}>
+                            <h4>{product.name}</h4>
+                            <p>Protein: {product.protein}</p>
+                            <p>Calories: {product.calories}</p>
+                            <p>Price: {product.price}</p>
+                            <p>Calories per 1g of protein: {product.caloriesPerProtein.toFixed(2)}</p>
+                            <p>Price of 1g of protein: {product.priceOfProtein.toFixed(2)}</p>
+                            {auth.userId === userId &&
+                                <>
+                                    <Button variant='contained' >
+                                        Update
+                                    </Button>
+                                    <Button  variant='contained' onClick={() => handleDeleteProduct(product.id)}>
+                                        Delete
+                                    </Button>
+                                </>
+                            }
+                        </li>
+                    ))}
+                </ul>
+            </div>
             <Dialog onClose={handleDialogClose} open={dialogInfo.isOpen}>
                 <DialogTitle>
                     {dialogInfo.title}
                 </DialogTitle>
                 <Box
                     component="form"
-                    onSubmit={dialogInfo.type === 'workout' ? handleWorkoutUpdate : loadedGoals.length === 0 ? handleAddGoals : handleUpdateGoals}
+                    onSubmit={dialogInfo.type === 'workout' ? handleUpdateWorkout : loadedGoals.length === 0 ? handleCreateGoals : handleUpdateGoals}
                     sx={{
                         '& .MuiTextField-root': { m: 1, width: '25ch' },
                     }}
@@ -317,7 +375,7 @@ export function UserPage() {
                         />
                         : <TextField
                             id='Workouts'
-                            label='Your Workouts'
+                            label='Your Workout'
                             variant='outlined' 
                             type='text' 
                             size='small'

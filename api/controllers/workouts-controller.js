@@ -33,8 +33,6 @@ async function createWorkoutDays(req, res, next) {
         return next(new HttpError('Something went wrong, try again later', 422));
     }
 
-    const { creator } = req.body;
-
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     let user;
