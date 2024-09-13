@@ -9,7 +9,7 @@ import { AuthContext } from '../../context';
 
 const useStyles = makeStyles(() => ({
     container: {
-        width: '100%',
+        // width: '100%',
         display: 'flex',
         backgroundColor: 'green',
         color: 'white',
@@ -21,13 +21,13 @@ const useStyles = makeStyles(() => ({
         display: 'flex',
         justifyContent: 'flex-end',
         width: '100%',
-        marginRight: 10
+        // marginRight: 10
         
     },
     button: {
         color: 'black !important',
         backgroundColor: 'yellow !important',
-        marginRight: '10px !important',
+        marginLeft: '10px !important',
         '&:hover': {
             backgroundColor: 'orange !important',
         }

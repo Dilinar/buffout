@@ -5,7 +5,7 @@ export const AuthContext = createContext({
     token: null,
     userId: null,
     userName: null,
-    onLogin: (uid: string, userName: string, token: string, expirationDate: any) => {},
+    onLogin: (uid: string, userName: string, token: string, expirationDate?: any) => {},
     onLogout: () => {}
 });
 

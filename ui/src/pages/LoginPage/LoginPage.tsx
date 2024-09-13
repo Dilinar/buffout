@@ -31,31 +31,12 @@ export function LoginPage() {
 
     const [ isLoginMode, setIsLoginMode ] = useState(true);
 
-    // const { isLoading, error, sendRequest, clearError } = useHttpClient();
     const { isLoading, sendRequest } = useHttpClient();
 
-    const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
+    // const expirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
 
     function handleModeSwitch() {
-        // if (!isLoginMode) {
-        //     setFormData({
-        //         ...formState.inputs,
-        //         name: undefined,
-        //         image: undefined
-        //     }, formState.inputs.email.isValid && formState.inputs.password.isValid);
-        // } else {
-        //     setFormData({
-        //         ...formState.inputs,
-        //         name: {
-        //             value: '',
-        //             isValid: false
-        //         },
-        //         image: {
-        //             value: null,
-        //             isValid: false
-        //         }
-        //     }, false);
-        // }
+
         setIsLoginMode(prevMode => !prevMode);
     };
 
@@ -182,7 +163,7 @@ export function LoginPage() {
                     },
                 );
 
-                auth.onLogin(responseData.userId, responseData.name, responseData.token, expirationDate);
+                auth.onLogin(responseData.userId, responseData.name, responseData.token);
             } catch (error) {
                 console.error(error);
             }
@@ -201,7 +182,7 @@ export function LoginPage() {
                     appendedFormData
                 );
 
-                auth.onLogin(responseData.userId, responseData.name, responseData.token, expirationDate);
+                auth.onLogin(responseData.userId, responseData.name, responseData.token);
             } catch (error) {
                 console.error(error);
             }

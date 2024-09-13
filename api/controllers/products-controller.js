@@ -85,7 +85,7 @@ async function updateProduct(req, res, next) {
         return next(new HttpError('Invalid inputs passed, please check your data.', 422));
     }
 
-    const { name, protein, price } = req.body;
+    const { name, protein, price, calories } = req.body;
     const productId = req.params.pid;
 
     let product
@@ -95,10 +95,17 @@ async function updateProduct(req, res, next) {
         return next(new HttpError('Could not find the product.', 500));
     }
 
+    if (product.creator.toString() !== req.userData.userId) {
+        const error = new HttpError('You are not allowed to edit these goals.', 401);
+        return next(error);
+    }
+
     product.name = name;
     product.protein = protein;
     product.price = price;
-    product.value = price/protein;
+    product.calories = calories;
+    product.caloriesPerProtein = calories/protein;
+    product.priceOfProtein = price/protein;
 
     try {
         await product.save();
