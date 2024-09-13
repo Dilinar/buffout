@@ -86,7 +86,7 @@ export function ProtCalculatorPage() {
                 }
                 <TextField
                     id="protein"
-                    label="Protein"
+                    label="Proteins (in grams)"
                     variant='outlined' 
                     type='number' 
                     size='small'

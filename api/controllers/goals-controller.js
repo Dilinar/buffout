@@ -76,7 +76,7 @@ const updateGoals = async (req, res, next) => {
         return next(new HttpError('Invalid inputs passed, please check your data.', 422));
     }
 
-    const { creator, goals } = req.body;
+    const { goals } = req.body;
     const goalsId = req.params.gid;
 
     let updatedGoals;
