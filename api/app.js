@@ -49,7 +49,7 @@ app.use((error, req, res, next) => {
 
 // Establishes connection to MongoDB database
 mongoose
-    .connect(`mongodb+srv://slavicayarns:vTsEFfxkiCXHpvUH@buffout.20mcd.mongodb.net/Buffout-dev?retryWrites=true&w=majority&appName=Buffout`)
+    .connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@buffout.20mcd.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Buffout`)
     .then(app.listen(3000))
     .catch(err => console.log(err));
  
