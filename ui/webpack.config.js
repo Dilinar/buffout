@@ -1,18 +1,19 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
+const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { HotModuleReplacementPlugin } = require('webpack');
+const { HotModuleReplacementPlugin, web } = require('webpack');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 module.exports = {
     entry: './src/index.tsx',
     mode: 'development',
     output: {
-        // path: path.resolve(__dirname, './docs'),
         filename: 'index.js',
-        /*Switch the following 2 lines to run the project localy*/
-        // publicPath: '/docs/'
         publicPath: '/'
     },
     resolve: {
@@ -21,10 +22,6 @@ module.exports = {
     },
     devServer: {
         port: 8080,
-        /*Switch the following 2 lines to run the project localy*/
-        // historyApiFallback: {
-        //     rewrites: [ { from: /\//, to: '/404.html' } ],
-        // },
         historyApiFallback: true
     },
     module: {
@@ -59,8 +56,10 @@ module.exports = {
         new CopyWebpackPlugin({
             patterns: [
                 { from: './src/style.css', to: './' },
-                // { from: './src/assets', to: 'static/' },
             ]
+        }),
+        new webpack.DefinePlugin({
+            'process.env': JSON.stringify(process.env)
         }),
         new HotModuleReplacementPlugin()
     ]

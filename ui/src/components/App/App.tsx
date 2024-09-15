@@ -20,7 +20,7 @@ export function App() {
         setToken(token);
         setUserId(uid);
         setUserName(userName);
-        const newExpirationDate = expirationDate || new Date(new Date().getTime() + 5000);
+        const newExpirationDate = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
         setTokenExpirationDate(newExpirationDate);
         localStorage.setItem('userData', JSON.stringify({ userId: uid, userName: userName, token: token, expiration: tokenExpirationDate.toISOString() }));
     }, []);
@@ -35,7 +35,7 @@ export function App() {
 
     const resetTokenExpirationDate = useCallback(() => {
         if (token) {
-            const newExpirationDate = new Date(new Date().getTime() + 5000);
+            const newExpirationDate = new Date(new Date().getTime() + 1000 * 60 * 60);
             setTokenExpirationDate(newExpirationDate);
             localStorage.setItem('userData', JSON.stringify({ userId, userName, token, expiration: newExpirationDate.toISOString() }));
         }
@@ -59,9 +59,9 @@ export function App() {
             login(storedData.userId, storedData.userName, storedData.token, new Date(storedData.expiration));
         }
     }, [login]);
-    console.log(tokenExpirationDate)
+
     useEffect(() => {
-        console.log('ding')
+
         const events = ['mousemove', 'mousedown', 'keypress', 'touchstart'];
         const resetExpiration = () => {
             resetTokenExpirationDate();

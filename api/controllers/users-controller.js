@@ -94,7 +94,7 @@ async function signUp(req, res, next) {
     try {
         token = jwt.sign(
             { userId: newUser.id, email: newUser.email, name: newUser.name },
-            'super_top_secret_code_dont_share_with_anyone_ever_04021190',
+            process.env.JWT_KEY,
             { expiresIn: '1h' }
         );
     } catch (err) {
@@ -145,7 +145,7 @@ async function login(req, res, next) {
     try {
         token = jwt.sign(
             { userId: existingUser.id, email: existingUser.email, name: existingUser.name },
-            'super_top_secret_code_dont_share_with_anyone_ever_04021190',
+            process.env.JWT_KEY,
             { expiresIn: '1h' }
         );
     } catch (err) {
