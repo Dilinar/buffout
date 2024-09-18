@@ -65,7 +65,7 @@ export function UserPage() {
 
     async function fetchUser() {
         try {
-            const responseData = await sendRequest(`http://localhost:3000/api/users/${userId}`,
+            const responseData = await sendRequest(`${process.env.REACT_APP_API_URL}/users/${userId}`,
                 'GET',
                 null,
                 {
@@ -81,7 +81,7 @@ export function UserPage() {
 
     async function fetchGoals() {
         try {
-            const responseData = await sendRequest(`http://localhost:3000/api/goals/${userId}`,
+            const responseData = await sendRequest(`${process.env.REACT_APP_API_URL}/goals/${userId}`,
                 'GET',
                 null,
                 {
@@ -97,7 +97,7 @@ export function UserPage() {
 
     async function fetchWorkouts() {
         try {
-            const responseData = await sendRequest(`http://localhost:3000/api/workouts/${userId}`,
+            const responseData = await sendRequest(`${process.env.REACT_APP_API_URL}/workouts/${userId}`,
                 'GET',
                 null,
                 {
@@ -113,7 +113,7 @@ export function UserPage() {
 
     async function fetchProducts() {
         try {
-            const responseData = await sendRequest(`http://localhost:3000/api/products/${userId}`,
+            const responseData = await sendRequest(`${process.env.REACT_APP_API_URL}/products/${userId}`,
                 'GET',
                 null,
                 {
@@ -132,7 +132,7 @@ export function UserPage() {
 
         try {
             await sendRequest(
-                'http://localhost:3000/api/goals/create',
+                `${process.env.REACT_APP_API_URL}/goals/create`,
                 'POST',
                 JSON.stringify({
                     goals: selectedGoals,
@@ -156,7 +156,7 @@ export function UserPage() {
 
         try {
             await sendRequest(
-                `http://localhost:3000/api/goals/${dialogInfo.id}`,
+                `${process.env.REACT_APP_API_URL}/goals/${dialogInfo.id}`,
                 'PATCH',
                 JSON.stringify({
                     goals: selectedGoals,
@@ -184,7 +184,7 @@ export function UserPage() {
 
         try {
             await sendRequest(
-                'http://localhost:3000/api/workouts/create',
+                `${process.env.REACT_APP_API_URL}/workouts/create`,
                 'POST',
                 null,
                 {
@@ -206,7 +206,7 @@ export function UserPage() {
         const dayIdIndex = loadedWorkouts.findIndex((workout: any) => workout.id === dialogInfo.id);
 
         sendRequest(
-            `http://localhost:3000/api/workouts/${dialogInfo.id}`,
+            `${process.env.REACT_APP_API_URL}/workouts/${dialogInfo.id}`,
             'PATCH',
             JSON.stringify({
                 exercises: selectedExercises
@@ -234,7 +234,7 @@ export function UserPage() {
         const productIdIndex = loadedProducts.findIndex((product: any) => product.id === productDialogInfo.id);
 
         sendRequest(
-            `http://localhost:3000/api/products/${productDialogInfo.id}`,
+            `${process.env.REACT_APP_API_URL}/products/${productDialogInfo.id}`,
             'PATCH',
             JSON.stringify({
                 name: selectedProduct.name,
@@ -267,7 +267,7 @@ export function UserPage() {
     async function handleDeleteProduct(productId: string) {
         try {
             await sendRequest(
-                `http://localhost:3000/api/products/${productId}`,
+                `${process.env.REACT_APP_API_URL}/products/${productId}`,
                 'DELETE',
                 null,
                 {

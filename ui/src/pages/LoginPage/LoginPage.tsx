@@ -152,7 +152,7 @@ export function LoginPage() {
         if (isLoginMode) {
             try {
                 const responseData = await sendRequest(
-                    'http://localhost:3000/api/users/login',
+                    `${process.env.REACT_APP_API_URL}/users/login`,
                     'POST',
                     JSON.stringify({
                         email: formData.email,
@@ -177,7 +177,7 @@ export function LoginPage() {
                 appendedFormData.append('image', formData.image);
 
                 const responseData = await sendRequest(
-                    'http://localhost:3000/api/users/signup',
+                    `${process.env.REACT_APP_API_URL}/users/signup`,
                     'POST',
                     appendedFormData
                 );
