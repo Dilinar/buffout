@@ -40,7 +40,7 @@ export function ProtCalculatorPage() {
 
         try{
             await sendRequest(
-                'http://localhost:3000/api/products/create',
+                `${process.env.REACT_APP_API_URL}/products/create`,
                 'POST',
                 JSON.stringify({
                     name: formData.name,

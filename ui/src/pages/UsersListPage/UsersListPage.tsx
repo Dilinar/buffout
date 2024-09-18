@@ -16,7 +16,7 @@ export function UsersListPage() {
         const fetchUsers = async () => {
 
             try {
-                const responseData = await sendRequest('http://localhost:3000/api/users',
+                const responseData = await sendRequest(`${process.env.REACT_APP_API_URL}/users`,
                     'GET',
                     null,
                     {
