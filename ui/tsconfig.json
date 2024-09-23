@@ -23,7 +23,10 @@
         "noImplicitThis": true,
         "resolveJsonModule": true,
         "noImplicitAny": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "types": [
+            "vitest/globals"
+        ]
     },
     "exclude": [
         "node_modules/",

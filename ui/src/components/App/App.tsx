@@ -22,7 +22,7 @@ export function App() {
         setUserName(userName);
         const newExpirationDate = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60);
         setTokenExpirationDate(newExpirationDate);
-        localStorage.setItem('userData', JSON.stringify({ userId: uid, userName: userName, token: token, expiration: tokenExpirationDate.toISOString() }));
+        localStorage.setItem('userData', JSON.stringify({ userId: uid, userName: userName, token: token, expiration: newExpirationDate.toISOString() }));
     }, []);
 
     const logout = useCallback(() => {
