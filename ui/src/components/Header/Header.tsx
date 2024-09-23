@@ -9,20 +9,15 @@ import { AuthContext } from '../../context';
 
 const useStyles = makeStyles(() => ({
     container: {
-        // width: '100%',
         display: 'flex',
         backgroundColor: 'green',
         color: 'white',
         padding: 10,
-        // flexDirection: 'row',
-        // alignItems: 'center'
     },
     navContainer: {
         display: 'flex',
         justifyContent: 'flex-end',
-        width: '100%',
-        // marginRight: 10
-        
+        width: '100%',     
     },
     button: {
         color: 'black !important',
@@ -32,27 +27,6 @@ const useStyles = makeStyles(() => ({
             backgroundColor: 'orange !important',
         }
     }
-    // image: {
-    //     width: '90vw',
-    //     maxWidth: 700
-    // },
-    // title: {
-    //     width: '100%',
-    //     textAlign: 'center',
-    //     fontFamily: 'Norse',
-    //     fontSize: 26
-    // },
-    // properties: {
-    //     maxWidth: '100%',
-    //     width: 800,
-    //     textAlign: 'center'
-    // },
-    // description: {
-    //     fontWeight: 'normal',
-    //     fontSize: 20,
-    //     textAlign: 'center',
-    //     marginTop: 0
-    // }
 }));
 
 
